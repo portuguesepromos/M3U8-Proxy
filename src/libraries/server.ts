@@ -469,6 +469,20 @@ export default function server() {
             // Do not add X-Forwarded-For, etc. headers, because Heroku already adds it.
             xfwd: false,
         },
+        handleInitialRequest: (req, res) => {
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+        res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization, X-Requested-With");
+        
+        // Handle preflight requests
+        if (req.method === "OPTIONS") {
+            res.writeHead(204);
+            res.end();
+            return true; // Skip further processing
+        }
+
+        return false; // Continue with proxy logic
+        },
     }).listen(port, Number(host), function () {
         console.log(colors.green("Server running on ") + colors.blue(`${web_server_url}`));
     });
